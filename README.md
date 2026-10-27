@@ -119,7 +119,7 @@ ai-agent-backend
 ├── ai-agent-pexelssearch-mcp-server/  # MCP 子模块：Pexels 图片搜索服务（stdio 默认 / SSE 可选）
 ├── src/main/java/com/xin/aiagentbackend/
 │   ├── agent/                         # Agent 框架：BaseAgent → ToolCallAgent → ReActAgent → Manus
-│   ├── app/                           # LoveApp 应用服务 + AIController 对话接口（SSE / 非流式）
+│   ├── app/                           # App 应用服务 + AIController 对话接口（SSE / 非流式）
 │   ├── conversation/                  # 会话与消息管理（REST + Repository）
 │   ├── plan/                          # 旅行计划管理 + PDF 攻略导出
 │   ├── route/                         # 路线查询（高德地理编码 + 路径规划）
