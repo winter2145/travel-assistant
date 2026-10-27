@@ -1,0 +1,104 @@
+server:
+  port: ${SERVER_PORT:8123}
+  servlet:
+    context-path: /api
+spring:
+  profiles:
+    active: dev
+
+## 以下是 application-dev.yml 文件结构
+#amap:
+#  web:
+#    key: ${AMAP_WEB_KEY:your_key}
+#pexels:
+#  api-key: ${PEXELS_API_KEY:your_key}
+#travel:
+#  pdf:
+#    font: ${TRAVEL_PDF_FONT:}
+#spring:
+#  application:
+#    name: ai-agent-backend
+#  threads:
+#    virtual:
+#      enabled: true
+#  # PostgreSQL 数据源（pgvector 持久化 RAG）
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/agent_db
+#    username: your_username
+#    password: your_password
+#    driver-class-name: org.postgresql.Driver
+#  sql:
+#    init:
+#      mode: always
+#      schema-locations: classpath:db/migration/001_travel_business.sql
+#  ai:
+#    dashscope:
+#        api-key: your_key
+#
+#        chat:
+#          options:
+#            model: qwen3.8-max
+#    advisor:
+#      logger:
+#        level: INFO
+#    # PgVectorStore 自动装配：按配置自动初始化表结构（initialize-schema: true）
+#    # dimensions 必须与实际 Embedding 输出维度一致：
+#    # DashScope text-embedding-v3 默认返回 1536 维（未显式指定 dimensions 时）
+#    vectorstore:
+#      type: pgvector
+#      pgvector:
+#        initialize-schema: true
+#        index-type: HNSW
+#        distance-type: COSINE_DISTANCE
+#        dimensions: 1536
+#        schema-name: public
+#        table-name: vector_store
+## （需要启动 MCP 服务）
+#    mcp:
+#      client:
+#        enabled: true
+#        name: ai-agent-mcp-client
+#        version: 1.0.0
+#        type: SYNC
+#        # 放宽 MCP 工具调用请求超时（默认 20s）：wikimedia 服务端调用公网 API 较慢，
+#        # 20s 会导致工具调用超时；amap 工具调用均在秒级完成，不受影响
+#        request-timeout: 60s
+#        # amap 子模块：stdio 方式，由本应用启动时自动拉起 ai-agent-amap-mcp-server
+#        stdio:
+#          servers-configuration: classpath:mcp-servers.json
+## （要启动 MCP 服务）
+##        # Pexels MCP 子模块采用 SSE，必须先单独启动 ai-agent-pexelssearch-mcp-server（端口 8092）
+##        sse:
+##          connections:
+##            pexels:
+##              url: http://localhost:8092
+##              sse-endpoint: /sse
+#
+## knife4j （springdoc-openapi + knife4j）接口文档配置
+## springdoc-openapi
+#springdoc:
+#  swagger-ui:
+#    path: /swagger-ui.html
+#    tags-sorter: alpha
+#    operations-sorter: alpha
+#  api-docs:
+#    path: /v3/api-docs
+#  group-configs:
+#    - group: 'default'
+#      paths-to-match: '/**'
+#      packages-to-scan:
+#        - com.xin.aiagentbackend
+## knife4j
+#knife4j:
+#  enable: true
+#  setting:
+#    language: zh_cn
+#
+#logging:
+#  level:
+#    # DashScope底层API，会打印完整请求/响应http json，这是核心！
+#    com.alibaba.cloud.ai.dashscope.api: DEBUG
+#    # 可选：把chatmodel相关也打开，方便追踪options合并
+#    com.alibaba.cloud.ai.dashscope.chat: DEBUG
+#    # 你的包路径，INFO即可
+#    com.xin.aiagentbackend: INFO

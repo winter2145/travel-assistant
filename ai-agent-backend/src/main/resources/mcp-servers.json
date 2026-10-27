@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "amap-mcp-server": {
+      "command": "java",
+      "args": [
+        "-jar",
+        "ai-agent-amap-mcp-server/target/ai-agent-amap-mcp-server-0.0.1-SNAPSHOT.jar"
+      ]
+    },
+    "pexelssearch-mcp-server": {
+      "command": "java",
+      "args": [
+        "-jar",
+        "ai-agent-pexelssearch-mcp-server/target/ai-agent-pexelssearch-mcp-server-0.0.1-SNAPSHOT.jar"
+      ]
+    }
+  }
+}

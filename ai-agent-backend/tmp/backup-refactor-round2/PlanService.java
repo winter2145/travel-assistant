@@ -1,0 +1,90 @@
+package com.xin.aiagentbackend.plan;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.xin.aiagentbackend.api.ApiException;
+import com.xin.aiagentbackend.conversation.service.ConversationService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+public class PlanService {
+    private static final int MAX_PAGE_SIZE = 100;
+    private final PlanRepository repository;
+    private final ConversationService conversations;
+
+    public PlanService(PlanRepository repository, ConversationService conversations) {
+        this.repository = repository;
+        this.conversations = conversations;
+    }
+
+    @Transactional
+    public PlanDto create(PlanRequest request) {
+        validateItinerary(request.itinerary());
+        String conversationId = normalizeConversationId(request.conversationId());
+        if (conversationId != null) conversations.get(conversationId);
+        return repository.create(conversationId, request.title().strip(), request.itinerary(), request.budgetSummary());
+    }
+
+    public PlanPageDto list(int page, int pageSize, String keyword) {
+        int safePage = validPage(page);
+        int safeSize = validPageSize(pageSize);
+        return new PlanPageDto(repository.list(safeSize, (safePage - 1) * safeSize, keyword),
+                repository.count(keyword), safePage, safeSize);
+    }
+
+    public PlanDto get(String id) { return repository.get(id).orElseThrow(() -> ApiException.notFound("旅行计划不存在")); }
+
+    public PlanDto getByConversation(String conversationId) {
+        return repository.getByConversation(conversationId).orElseThrow(() -> ApiException.notFound("该会话还没有已保存的行程"));
+    }
+
+    @Transactional
+    public PlanDto update(String id, UpdatePlanRequest request) {
+        PlanDto current = get(id);
+        validateItinerary(request.itinerary());
+        String title = request.title() == null || request.title().isBlank() ? current.title() : request.title().strip();
+        return repository.update(id, title, request.itinerary(), request.budgetSummary(), request.version());
+    }
+
+    @Transactional
+    public void delete(String id) {
+        if (!repository.delete(id)) throw ApiException.notFound("旅行计划不存在");
+    }
+
+    @Transactional
+    public PlanDto duplicate(String id) {
+        PlanDto original = get(id);
+        JsonNode itinerary = original.itinerary();
+        return repository.create(null, original.title() + "（副本）", itinerary, original.budgetSummary());
+    }
+
+    private String normalizeConversationId(String id) {
+        return id == null || id.isBlank() ? null : id.strip();
+    }
+
+    private void validateItinerary(JsonNode itinerary) {
+        if (itinerary == null || !itinerary.isObject()) throw ApiException.badRequest("itinerary必须是JSON对象");
+        if (itinerary.path("city").asText().isBlank()) throw ApiException.badRequest("行程目的地不能为空");
+        JsonNode days = itinerary.path("days");
+        if (!days.isArray() || days.isEmpty() || days.size() > 14) throw ApiException.badRequest("行程天数必须在1到14天之间");
+        if (itinerary.path("budget").asDouble(-1) < 0) throw ApiException.badRequest("预算不能为负数");
+        String startDate = itinerary.path("startDate").asText("");
+        if (!startDate.isBlank()) {
+            try { java.time.LocalDate.parse(startDate); }
+            catch (Exception e) { throw ApiException.badRequest("startDate必须使用yyyy-MM-dd格式"); }
+        }
+        for (JsonNode day : days) {
+            if (!day.path("activities").isArray()) throw ApiException.badRequest("每日行程必须包含activities数组");
+            for (JsonNode activity : day.path("activities")) {
+                if (activity.path("name").asText().isBlank()) throw ApiException.badRequest("活动名称不能为空");
+                if (activity.path("estimatedCost").asDouble(0) < 0) throw ApiException.badRequest("活动费用不能为负数");
+            }
+        }
+    }
+
+    private int validPage(int value) { if (value < 1) throw ApiException.badRequest("page必须大于等于1"); return value; }
+    private int validPageSize(int value) {
+        if (value < 1 || value > MAX_PAGE_SIZE) throw ApiException.badRequest("pageSize必须在1到100之间");
+        return value;
+    }
+}

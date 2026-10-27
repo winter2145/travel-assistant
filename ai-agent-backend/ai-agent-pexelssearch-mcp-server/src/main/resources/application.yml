@@ -1,0 +1,33 @@
+server:
+  port: 8092
+
+spring:
+  application:
+    name: ai-agent-pexelssearch-mcp-server
+  profiles:
+    active: stdio
+
+
+## 以下是 application-stdio.yml 文件结构
+#spring:
+#  ai:
+#    mcp:
+#      server:
+#        name: ai-agent-pexelssearch-mcp-server
+#        version: 1.0.0
+#        type: SYNC
+#        instructions: "This server provides search Scenic spot photo tools "
+#        capabilities:
+#          tool: true
+#          resource: true
+#          prompt: true
+#          completion: true
+#        # sse
+#        stdio: true
+#  # stdio
+#  main:
+#    web-application-type: none # 关闭web，不启动tomcat
+#    banner-mode: off # 关掉banner！banner输出到stdout，直接破坏MCP json协议
+#
+#pexels:
+#  api-key: ${PEXELS_API_KEY:your_key}

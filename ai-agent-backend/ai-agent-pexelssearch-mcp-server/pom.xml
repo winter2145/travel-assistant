@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.16</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <groupId>com.xin</groupId>
+    <artifactId>ai-agent-pexelssearch-mcp-server</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>ai-agent-pexelssearch-mcp-server</name>
+    <description>ai-agent-pexelssearch-mcp-server</description>
+    <url/>
+    <licenses>
+        <license/>
+    </licenses>
+    <developers>
+        <developer/>
+    </developers>
+    <scm>
+        <connection/>
+        <developerConnection/>
+        <tag/>
+        <url/>
+    </scm>
+    <properties>
+        <java.version>21</java.version>
+    </properties>
+    <!--
+      说明：
+      1. 与父模块 ai-agent-backend 保持同一技术栈（Boot 3.5.16 + Spring AI 1.1.2），
+         MCP 协议版本与父模块客户端完全互通。
+      2. 采用 SSE 模式对外提供 MCP 服务：使用 spring-ai-starter-mcp-server-webmvc，
+         SSE 端点默认 /sse，端口 8092（见 application.yml）。
+         父模块通过 spring.ai.mcp.client.sse.connections.pexels 连接本服务。
+      3. 注意：spring-boot-starter-restclient 是 Spring Boot 4 才提供的 starter，
+         Boot 3.5 的 BOM 不管理该构件，会导致 Maven 校验报 "version missing"。
+         这里改用 spring-boot-starter-web（自带 RestClient / Jackson / WebMvc）。
+    -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-bom</artifactId>
+                <version>1.1.2</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    <dependencies>
+        <!-- WebMvc 容器 + Jackson + RestClient（SSE 端点依赖 Web 容器） -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- MCP Server（SSE 模式），版本由 spring-ai-bom 1.1.2 管理，与父模块客户端同版本 -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
